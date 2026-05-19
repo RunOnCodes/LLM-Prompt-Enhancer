@@ -1,3 +1,5 @@
+// content.js - Fixed for Gemini duplicate buttons
+
 function applyTextDirection(el) {
     if (el.nodeType !== 1) return; 
     if (el.closest("nav") || el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
@@ -32,8 +34,7 @@ function setReactInputValue(element, value) {
         nativeInputValueSetter.call(element, value);
         element.dispatchEvent(new Event('input', { bubbles: true }));
     } else {
-        // For contenteditable divs (like Perplexity), setting textContent is not enough.
-        // We have to focus it, clear it, and use execCommand so React catches the change.
+        // For contenteditable divs (like Perplexity, Gemini)
         element.focus();
         document.execCommand('selectAll', false, null);
         document.execCommand('insertText', false, value);
@@ -41,121 +42,134 @@ function setReactInputValue(element, value) {
 }
 
 function addEnhanceButton() {
-    let textareas;
-    if (window.location.hostname.includes('chatgpt') || window.location.hostname.includes('openai.com')) {
-        textareas = document.querySelectorAll('div[contenteditable="true"]');
+    let inputs = [];
+
+    // Platform-specific selectors to avoid multiple buttons
+    if (window.location.hostname.includes('gemini.google.com')) {
+        // Gemini: use the most specific selector for the real chat input
+        inputs = document.querySelectorAll('div[contenteditable="true"][role="textbox"]');
+        // Fallback: any visible contenteditable div (exclude hidden ones)
+        if (inputs.length === 0) {
+            inputs = document.querySelectorAll('div[contenteditable="true"]:not([hidden])');
+        }
+    } else if (window.location.hostname.includes('chatgpt') || window.location.hostname.includes('openai.com')) {
+        inputs = document.querySelectorAll('div[contenteditable="true"]');
     } else {
-        textareas = document.querySelectorAll('textarea, div[contenteditable="true"]');
+        inputs = document.querySelectorAll('textarea, div[contenteditable="true"]');
     }
 
-    textareas.forEach(textarea => {
-        if (!textarea.dataset.enhanceButtonAdded) {
-            textarea.dataset.enhanceButtonAdded = 'true';
+    inputs.forEach(input => {
+        // Skip if this input already has a button
+        if (input.dataset.enhanceButtonAdded) return;
 
-            const container = document.createElement('div');
-            container.className = 'enhancer-btn-container';
+        // Extra safety: check if a container already exists next to this input
+        const existingContainer = input.parentNode?.querySelector('.enhancer-btn-container');
+        if (existingContainer) return;
 
-            const button = document.createElement('button');
-            button.className = 'enhance-button';
-            button.textContent = '✨ Enhance Prompt';
-            button.title = "Shortcut: Ctrl+Shift+E";
+        input.dataset.enhanceButtonAdded = 'true';
 
-            const revertBtn = document.createElement('button');
-            revertBtn.className = 'enhance-button revert-button';
-            revertBtn.textContent = '↩ Revert';
-            revertBtn.style.display = 'none';
+        const container = document.createElement('div');
+        container.className = 'enhancer-btn-container';
 
-            const toast = document.createElement('span');
-            toast.className = 'enhancer-inline-toast';
+        const button = document.createElement('button');
+        button.className = 'enhance-button';
+        button.textContent = '✨ Enhance Prompt';
+        button.title = "Shortcut: Ctrl+Shift+E";
 
-            container.appendChild(button);
-            container.appendChild(revertBtn);
-            container.appendChild(toast);
+        const revertBtn = document.createElement('button');
+        revertBtn.className = 'enhance-button revert-button';
+        revertBtn.textContent = '↩ Revert';
+        revertBtn.style.display = 'none';
 
-            if (window.location.hostname.includes('perplexity.ai')) {
-                const parent = textarea.parentElement;
-                if (parent) {
-                    parent.style.overflow = 'visible'; 
-                    if (parent.parentElement) parent.parentElement.style.overflow = 'visible';
-                }
+        const toast = document.createElement('span');
+        toast.className = 'enhancer-inline-toast';
+
+        container.appendChild(button);
+        container.appendChild(revertBtn);
+        container.appendChild(toast);
+
+        // Special handling for Perplexity to avoid overflow clipping
+        if (window.location.hostname.includes('perplexity.ai')) {
+            const parent = input.parentElement;
+            if (parent) {
+                parent.style.overflow = 'visible'; 
+                if (parent.parentElement) parent.parentElement.style.overflow = 'visible';
+            }
+        }
+
+        input.parentNode.insertBefore(container, input.nextSibling);
+
+        let originalText = '';
+
+        const triggerEnhance = async () => {
+            const currentText = input.tagName === 'TEXTAREA' ? input.value : input.textContent;
+            let textToEnhance = currentText;
+            let isSelection = false;
+
+            const selection = window.getSelection().toString();
+            if (selection && currentText.includes(selection)) {
+                textToEnhance = selection;
+                isSelection = true;
             }
 
-            textarea.parentNode.insertBefore(container, textarea.nextSibling);
+            if (!textToEnhance.trim()) {
+                showToast(toast, 'Input is empty', true);
+                return;
+            }
 
-            let originalText = '';
+            originalText = currentText; 
+            button.textContent = '✨ Enhancing...';
+            button.disabled = true;
 
-            const triggerEnhance = async () => {
-                const currentText = textarea.tagName === 'TEXTAREA' ? textarea.value : textarea.textContent;
-                let textToEnhance = currentText;
-                let isSelection = false;
-
-                const selection = window.getSelection().toString();
-                if (selection && currentText.includes(selection)) {
-                    textToEnhance = selection;
-                    isSelection = true;
-                }
-
-                if (!textToEnhance.trim()) {
-                    showToast(toast, 'Input is empty', true);
-                    return;
-                }
-
-                originalText = currentText; 
-                button.textContent = '✨ Enhancing...';
-                button.disabled = true;
-
-                try {
-                    chrome.runtime.sendMessage({ action: 'enhance', text: textToEnhance }, (response) => {
-                        if (chrome.runtime.lastError) {
-                            console.error(chrome.runtime.lastError.message);
-                            button.textContent = '✨ Enhance Prompt';
-                            button.disabled = false;
-                            showToast(toast, "Extension updated. Please refresh the page.", true);
-                            return;
-                        }
-
+            try {
+                chrome.runtime.sendMessage({ action: 'enhance', text: textToEnhance }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.error(chrome.runtime.lastError.message);
                         button.textContent = '✨ Enhance Prompt';
                         button.disabled = false;
+                        showToast(toast, "Extension updated. Please refresh the page.", true);
+                        return;
+                    }
 
-                        if (!response) {
-                             showToast(toast, "Error connecting to extension. Please refresh the page.", true);
-                             return;
-                        }
-
-                        if (response.error) {
-                            showToast(toast, response.error, true);
-                        } else {
-                            let newFullText = response.text;
-
-                            if (isSelection) {
-                                newFullText = currentText.replace(selection, response.text);
-                            }
-
-                            // Use the robust React setter function to actually change the text
-                            setReactInputValue(textarea, newFullText);
-
-                            revertBtn.style.display = 'inline-block';
-                            showToast(toast, 'Enhanced successfully!', false);
-                        }
-                    });
-                } catch (e) {
-                    console.error("SendMessage failed:", e);
                     button.textContent = '✨ Enhance Prompt';
                     button.disabled = false;
-                    showToast(toast, "Extension context error. Please refresh the page.", true);
-                }
-            };
 
-            button.onclick = triggerEnhance;
+                    if (!response) {
+                         showToast(toast, "Error connecting to extension. Please refresh the page.", true);
+                         return;
+                    }
 
-            revertBtn.onclick = () => {
-                setReactInputValue(textarea, originalText);
-                revertBtn.style.display = 'none';
-                showToast(toast, 'Reverted to original', false);
-            };
+                    if (response.error) {
+                        showToast(toast, response.error, true);
+                    } else {
+                        let newFullText = response.text;
 
-            textarea.enhancerTrigger = triggerEnhance;
-        }
+                        if (isSelection) {
+                            newFullText = currentText.replace(selection, response.text);
+                        }
+
+                        setReactInputValue(input, newFullText);
+                        revertBtn.style.display = 'inline-block';
+                        showToast(toast, 'Enhanced successfully!', false);
+                    }
+                });
+            } catch (e) {
+                console.error("SendMessage failed:", e);
+                button.textContent = '✨ Enhance Prompt';
+                button.disabled = false;
+                showToast(toast, "Extension context error. Please refresh the page.", true);
+            }
+        };
+
+        button.onclick = triggerEnhance;
+
+        revertBtn.onclick = () => {
+            setReactInputValue(input, originalText);
+            revertBtn.style.display = 'none';
+            showToast(toast, 'Reverted to original', false);
+        };
+
+        input.enhancerTrigger = triggerEnhance;
     });
 }
 
@@ -181,6 +195,7 @@ setTimeout(() => {
     observer.observe(document.body, { childList: true, subtree: true });
 }, 1000);
 
+// Listen for keyboard shortcut
 try {
     chrome.runtime.onMessage.addListener((req) => {
         if (req.action === 'shortcut-enhance') {

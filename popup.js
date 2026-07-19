@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (optionExists) {
                 modelSelect.value = res.groqModel;
             } else {
-                modelSelect.value = "meta-llama/llama-4-scout-17b-16e-instruct";
+                modelSelect.value = "llama-3.1-70b-versatile";
             }
         }
     });

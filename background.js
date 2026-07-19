@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 return;
             }
 
-            const modelToUse = res.groqModel || 'meta-llama/llama-4-scout-17b-16e-instruct';
+            const modelToUse = res.groqModel || 'llama-3.1-70b-versatile';
 
             try {
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         messages: [
                             {
                                 role: 'system',
-                                content: 'You are an expert at turning short, informal user requests into clear, detailed, and effective prompts for a chat-based Large Language Model (LLM). Your goal is to rephrase the user text into a prompt that is ready to be pasted directly into a chat LLM to get a helpful and actionable answer. Focus on adding details, context, and specific instructions to make the prompt as effective as possible for getting a useful response from the LLM.  **CRITICAL: You MUST ensure that the rephrased prompt is in the SAME LANGUAGE as the ORIGINAL USER INPUT TEXT.  This language preservation is paramount. The rephrased prompt itself MUST be in the same language as the original input text.** Return ONLY the rephrased prompt. No extra commentary or explanations.'
+                                content: 'You are an expert at turning short, informal user requests into clear, detailed, and effective prompts for a chat-based Large Language Model (LLM). Your g[...]'
                             },
                             {
                                 role: 'user',
@@ -33,9 +33,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                     **Example of Rephrasing (for input: 'fix my blurry photo'):**
 
-                    "I have a photo that is blurry. What are some common reasons why photos become blurry?  And what are the best ways to try and fix a blurry photo? Please provide step-by-step instructions and suggest both software and online tools I could use.  Also, are there any limitations to fixing blurry photos?  For example, are some types of blurriness impossible to correct? **Respond in the same language as the original user request.**"
+                    "I have a photo that is blurry. What are some common reasons why photos become blurry?  And what are the best ways to try and fix a blurry photo? Please provide step-by-step in[...]
 
-                    Now, rephrase the following Original User Text into a detailed and user-ready prompt that can be directly used in a chat LLM.  Remember to ONLY return the rephrased prompt, ready to be used. Do not include any extra text or explanations. Just provide the rephrased prompt itself.
+                    Now, rephrase the following Original User Text into a detailed and user-ready prompt that can be directly used in a chat LLM.  Remember to ONLY return the rephrased prompt, rea[...]
                     `
                             }
                         ],
@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 console.error("Groq API Error:", error);
                 let errorMsg = error.message;
                 if (errorMsg.includes("rate_limit_exceeded") || errorMsg.includes("Rate limit reached")) {
-                    errorMsg = "Rate Limit Exceeded. Try again in a minute or switch to Llama 3.1 8B in settings.";
+                    errorMsg = "Rate Limit Exceeded. Try again in a minute or switch to a faster model in settings.";
                 } else if (errorMsg.includes("does not exist") || errorMsg.includes("404")) {
                     errorMsg = "Model not found. Please open settings and save a new AI model.";
                 }

@@ -1,4 +1,4 @@
-// content.js - Fixed for Gemini duplicate buttons
+// content.js - Enhanced with floating button placement
 
 function applyTextDirection(el) {
     if (el.nodeType !== 1) return; 
@@ -46,9 +46,7 @@ function addEnhanceButton() {
 
     // Platform-specific selectors to avoid multiple buttons
     if (window.location.hostname.includes('gemini.google.com')) {
-        // Gemini: use the most specific selector for the real chat input
         inputs = document.querySelectorAll('div[contenteditable="true"][role="textbox"]');
-        // Fallback: any visible contenteditable div (exclude hidden ones)
         if (inputs.length === 0) {
             inputs = document.querySelectorAll('div[contenteditable="true"]:not([hidden])');
         }
@@ -97,7 +95,49 @@ function addEnhanceButton() {
             }
         }
 
-        input.parentNode.insertBefore(container, input.nextSibling);
+        // ----- NEW: Floating button placement -----
+        const parent = input.parentNode;
+        if (!parent) return;
+
+        // Check if the parent is a suitable anchor; fallback to old insertion if not
+        const isProblematicParent = (parent === document.body) || 
+                                    (parent.closest('body') === document.body && parent.children.length === 1);
+
+        if (isProblematicParent) {
+            // Fallback: insert after the input (original behaviour)
+            input.parentNode.insertBefore(container, input.nextSibling);
+            // Reset any absolute positioning
+            container.style.position = 'static';
+            container.style.bottom = 'auto';
+            container.style.right = 'auto';
+        } else {
+            // Floating approach: make parent a positioning anchor
+            const computedPos = getComputedStyle(parent).position;
+            if (computedPos === 'static') {
+                parent.style.position = 'relative';
+            }
+
+            // Style the container as a floating toolbar
+            container.style.position = 'absolute';
+            container.style.bottom = '8px';
+            container.style.right = '8px';
+            container.style.display = 'flex';
+            container.style.gap = '6px';
+            container.style.alignItems = 'center';
+            container.style.zIndex = '100000';
+            container.style.pointerEvents = 'none';   // allow clicks to pass through to the input
+            container.style.background = 'transparent';
+
+            // Buttons need to receive pointer events
+            button.style.pointerEvents = 'auto';
+            revertBtn.style.pointerEvents = 'auto';
+            toast.style.pointerEvents = 'none';
+
+            // Append the container as a child of the input's parent
+            parent.appendChild(container);
+        }
+
+        // ---- End of placement ----
 
         let originalText = '';
 

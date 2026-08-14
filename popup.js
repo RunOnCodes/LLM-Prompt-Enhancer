@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (optionExists) {
                 modelSelect.value = res.groqModel;
             } else {
-                modelSelect.value = "llama-3.1-70b-versatile";
+                modelSelect.value = "openai/gpt-oss-120b";
             }
         }
     });

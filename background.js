@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 return;
             }
 
-            const modelToUse = res.groqModel || 'llama-3.1-70b-versatile';
+            const modelToUse = res.groqModel || 'openai/gpt-oss-120b';
 
             try {
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {

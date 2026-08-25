@@ -30,14 +30,23 @@ function showToast(el, msg, isError) {
 
 function setReactInputValue(element, value) {
     if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
-        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+        const prototype = element.tagName === 'TEXTAREA'
+            ? window.HTMLTextAreaElement.prototype
+            : window.HTMLInputElement.prototype;
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(prototype, "value").set;
         nativeInputValueSetter.call(element, value);
         element.dispatchEvent(new Event('input', { bubbles: true }));
     } else {
-        // For contenteditable divs (like Perplexity, Gemini)
         element.focus();
-        document.execCommand('selectAll', false, null);
-        document.execCommand('insertText', false, value);
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        if (!document.execCommand('insertText', false, value)) {
+            element.textContent = value;
+        }
+        element.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: value }));
     }
 }
 
@@ -181,7 +190,7 @@ function addEnhanceButton() {
 
                     if (response.error) {
                         showToast(toast, response.error, true);
-                    } else {
+                    } else if (typeof response.text === 'string' && response.text.trim()) {
                         let newFullText = response.text;
 
                         if (isSelection) {
@@ -191,6 +200,8 @@ function addEnhanceButton() {
                         setReactInputValue(input, newFullText);
                         revertBtn.style.display = 'inline-block';
                         showToast(toast, 'Enhanced successfully!', false);
+                    } else {
+                        showToast(toast, 'The API returned an empty response. Please try again.', true);
                     }
                 });
             } catch (e) {

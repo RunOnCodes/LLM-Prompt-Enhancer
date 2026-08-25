@@ -13,25 +13,28 @@
         <span class="brand__logo">✨</span>
         <h2 class="brand__title">Prompt Enhancer</h2>
       </div>
-      <p class="subtitle">Configure your enhancement settings.</p>
+      <p class="subtitle">Choose an AI provider and configure its API key.</p>
     </div>
 
     <form id="apiForm">
-      <label for="apiKey" class="label">Groq API Key</label>
+      <label for="providerSelect" class="label">AI Provider</label>
+      <div class="field-full">
+        <select id="providerSelect" class="input">
+          <option value="openrouter">OpenRouter</option>
+          <option value="groq">Groq</option>
+        </select>
+      </div>
+
+      <label for="apiKey" class="label" id="apiKeyLabel">OpenRouter API Key</label>
       <div class="field">
-        <input type="password" id="apiKey" class="input" placeholder="gsk_..." autocomplete="off">
+        <input type="password" id="apiKey" class="input" placeholder="sk-or-v1-..." autocomplete="off">
         <button type="button" class="icon-btn" id="toggleVis" title="Show/Hide">👁️</button>
         <button type="button" class="icon-btn" id="copyKey" title="Copy">📋</button>
       </div>
 
-      <label for="modelSelect" class="label">AI Model</label>
+        <label for="modelSelect" class="label" id="modelLabel">OpenRouter Model</label>
       <div class="field-full">
 		<select id="modelSelect" class="input">
-			  <option value="openai/gpt-oss-120b">GPT-OSS 120B (Smartest & Recommended)</option>
-			  <option value="openai/gpt-oss-20b">GPT-OSS 20B (Fastest)</option>
-			  <option value="qwen/qwen3.6-27b">Qwen 3.6 27B (Balanced · Preview)</option>
-			  <option value="groq/compound">Groq Compound (Agentic + Web Search)</option>
-			  <option value="groq/compound-mini">Groq Compound Mini (Lightweight Agentic)</option>
 		</select>
       </div>
 

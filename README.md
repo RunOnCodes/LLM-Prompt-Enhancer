@@ -1,4 +1,4 @@
-Prompt Enhancer Chrome Extension
+# Prompt Enhancer Chrome Extension
 
 ## Overview
 

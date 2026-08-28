@@ -1,73 +1,134 @@
-# Prompt Enhancer Chrome Extension
+# ✨ Prompt Enhancer & RTL Fix
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e)](LICENSE)
+[![Chrome](https://img.shields.io/badge/Chrome-Manifest%20V3-6366f1)](https://developer.chrome.com/docs/extensions/develop/concepts/manifest-v3)
+[![Providers](https://img.shields.io/badge/Providers-OpenRouter%20%7C%20Groq-34d399)](#supported-models)
+
+A **Chrome extension** that turns rough ideas into well-structured, effective prompts for LLMs — with a bonus automatic **RTL/LTR text-direction fix** for Persian and Arabic text on AI chat platforms.
 
 ## Overview
 
-The **Prompt Enhancer** is a Chrome extension designed to improve the quality of text prompts for Large Language Models (LLMs) using OpenRouter or Groq. It adds an "Enhance Prompt" button next to text areas on web pages. When clicked, the extension sends the text from the textarea to the selected provider, which uses an AI model to refine and enhance the text. The enhanced prompt is then automatically inserted back into the textarea, ready for use in your favorite chat-based LLM platforms.
+**Prompt Enhancer** adds an *"Enhance Prompt"* button next to text inputs on your favorite AI chat platforms. When clicked, the selected provider (OpenRouter or Groq) refines the text into a strong, self-contained prompt and inserts it back into the input — ready to send. It also detects Persian/Arabic text on the page and fixes its direction and alignment automatically.
 
 ## Features
 
-* **Prompt Enhancement:** Utilizes OpenRouter or Groq models to restructure and refine user-provided text into more effective prompts for LLMs.
-* **Seamless Integration:** Adds an "Enhance Prompt" button next to all textarea elements on any webpage, providing easy access to prompt enhancement wherever you need it.
-* **API Key Storage:** Securely stores OpenRouter and Groq API keys locally within the browser for persistent use.
-* **User-Friendly:** Simple popup interface to choose a provider, model, and API key.
-* **Real-time Feedback:** Provides "Enhancing..." status while processing and displays alerts for API key issues or errors.
+- ✨ **Prompt Enhancement** — restructures rough input into clear, actionable prompts while preserving intent, language, and tone
+- 🔀 **Provider Choice** — switch between **OpenRouter** and **Groq** with a segmented toggle
+- 🧠 **Model Picker** — custom dropdown with badges (Default / Free / Fast / Versatile / Reasoning) for each provider
+- 💾 **Secure Storage** — API keys and preferences saved per provider via `chrome.storage.sync`
+- 🌐 **RTL/LTR Auto-Fix** — Persian/Arabic text is detected and rendered right-to-left with the Vazirmatn font
+- ⌨️ **Keyboard Shortcut** — `Ctrl+Shift+E` (or `Cmd+Shift+E` on macOS) enhances the focused input
+- 💬 **Inline Feedback** — gradient button with a spinner while processing, plus glass-style success/error toasts
+- 🎨 **Modern UI** — dark-first popup with gradient accents and full light-mode support
 
-## Updated popup look
+## Screenshots
 
-* The popup presents a compact provider settings screen with separate model lists and API keys for OpenRouter and Groq.
-* The popup loads any previously saved key on open and provides a brief saved status message after storing changes.
-  
-<img width="333" height="386" alt="Screenshot_1" src="https://github.com/user-attachments/assets/5a915145-79cc-41d5-b76a-33a05e74ea66" />
+**Popup — provider, model, and API key settings:**
 
+<p align="center">
+  <img width="333" alt="Popup settings screen" src="https://github.com/user-attachments/assets/5a915145-79cc-41d5-b76a-33a05e74ea66" />
+</p>
 
+**Enhance Prompt button next to the input:**
+
+<p align="center">
+  <img width="904" alt="Enhance button next to a textarea" src="https://github.com/user-attachments/assets/007cf8cf-d869-4449-9d63-4a632afacabb" />
+</p>
+
+## Supported Models
+
+### Groq (default provider)
+
+| Model | Model ID |
+| --- | --- |
+| **Qwen 3.8 27B** *(default)* | `qwen/qwen3.8-27b` |
+| Llama 3.3 70B (Versatile) | `llama-3.3-70b-versatile` |
+| Llama 3.1 8B (Fast) | `llama-3.1-8b-instant` |
+| Llama 4 Maverick 17B | `meta-llama/llama-4-maverick-17b-128e-instruct` |
+| Llama 4 Scout 17B | `meta-llama/llama-4-scout-17b-16e-instruct` |
+| Kimi K2 (Reasoning) | `moonshotai/kimi-k2-instruct` |
+| GPT OSS 120B | `openai/gpt-oss-120b` |
+| GPT OSS 20B (Fast) | `openai/gpt-oss-20b` |
+| Qwen 3 32B | `qwen/qwen3-32b` |
+| Qwen 3.6 27B | `qwen/qwen3.6-27b` |
+
+### OpenRouter
+
+| Model | Model ID |
+| --- | --- |
+| **OpenRouter Free Router** *(default)* | `openrouter/free` |
+| Dots3 Note Preview | `dots-studio/dots-3-note-preview:free` |
+| Liquid LFM 2.5 2.6B | `liquid/lfm-2.5-2.6b:free` |
+| NVIDIA Nemotron 3.5 Lightning | `nvidia/nemotron-3.5-lightning:free` |
+| Thinking Machines Inkling | `thinkingmachines/inkling:free` |
+| Poolside Laguna S 2.1 | `poolside/laguna-s-2.1:free` |
+| Cohere North Mini Code | `cohere/north-mini-code:free` |
+| GLM 5.2 | `z-ai/glm-5.2:free` |
+| MiniMax M3 | `minimax/minimax-m3:free` |
+
+> 💡 Saved models that are later removed by a provider automatically fall back to the default — no stale-model errors.
 
 ## Installation
 
-1. **Download the repository:** You can download this repository as a ZIP file and extract it to your local machine.
-2. **Open Chrome Extensions page:** In your Chrome browser, navigate to `chrome://extensions/`.
-3. **Enable Developer mode:**  Toggle the "Developer mode" switch in the top right corner of the Extensions page to the "ON" position.
-4. **Load unpacked:** Click the "Load unpacked" button in the top left corner.
-5. **Select extension directory:**  Browse to the extracted folder of the "Prompt Enhancer" extension and select the folder.
-6. **Extension installed:** The "Prompt Enhancer" extension should now be installed and visible on your Chrome Extensions page.
+1. **Download the repository** — download it as a ZIP file and extract it to your local machine (or clone it with `git clone`).
+2. **Open the Extensions page** — navigate to `chrome://extensions/` in Chrome.
+3. **Enable Developer mode** — toggle the *"Developer mode"* switch in the top-right corner.
+4. **Load unpacked** — click the *"Load unpacked"* button in the top-left corner.
+5. **Select the extension directory** — browse to the extracted folder and select it.
+6. **Done** — *Prompt Enhancer & RTL Fix* now appears on the Extensions page. Pin it to the toolbar for quick access.
 
 ## Usage
 
-1. **Set a provider API key:**
-    * Click on the "Prompt Enhancer" extension icon in your Chrome toolbar. This will open the extension popup.
-    * Select OpenRouter or Groq and enter the matching API key into the provided input field.
-    * Click the "Save API Key" button. The extension will store your API key securely.
+### 1. Configure the provider
 
-2. **Enhance Prompts on any webpage:**
-    * Navigate to any website with a textarea where you would like to write a prompt (e.g., chat applications, forums, text editors).
-    * You will notice an "Enhance Prompt" button added next to each textarea.
+- Click the **Prompt Enhancer** icon in the Chrome toolbar to open the popup.
+- Pick a provider (**OpenRouter** or **Groq**) using the segmented toggle.
+- Enter the matching API key and choose a model from the dropdown.
+- Click **Save Settings** — the key and model are stored per provider.
 
-<img width="904" height="154" alt="2" src="https://github.com/user-attachments/assets/007cf8cf-d869-4449-9d63-4a632afacabb" />
-      
-    * Write your initial prompt in the textarea.
-    * Click the "Enhance Prompt" button.
-    * The button text will change to "Enhancing..." while the extension processes your prompt.
+<p align="center">
+  <img width="333" alt="Configuring the popup" src="https://github.com/user-attachments/assets/5a915145-79cc-41d5-b76a-33a05e74ea66" />
+</p>
 
-<img width="908" height="167" alt="3" src="https://github.com/user-attachments/assets/38fa6893-ce8d-4c6d-b401-4759b7ae4564" />
+### 2. Enhance a prompt
 
+1. Navigate to a supported site (ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Copilot, Grok, and many more) and an **Enhance Prompt** button appears near the input:
 
-    * Once enhanced, the textarea content will be replaced with the improved prompt generated by the selected provider.
-    * You can now use this enhanced prompt as needed.
+   <p align="center">
+     <img width="904" alt="Enhance button next to a textarea" src="https://github.com/user-attachments/assets/007cf8cf-d869-4449-9d63-4a632afacabb" />
+   </p>
 
+2. Write your rough prompt — or just select part of the text you want improved.
+3. Click **Enhance Prompt** (or press `Ctrl+Shift+E` while the input is focused). The button shows a spinner while processing:
 
-<img width="603" height="346" alt="4" src="https://github.com/user-attachments/assets/ad6d1bc2-3026-442f-a309-a1dea2a1ea0b" />
+   <p align="center">
+     <img width="908" alt="Enhancing state" src="https://github.com/user-attachments/assets/38fa6893-ce8d-4c6d-b401-4759b7ae4564" />
+   </p>
 
+4. The input is replaced with the enhanced prompt, and a success toast appears. You can also **Revert** to the original text at any time:
 
+   <p align="center">
+     <img width="603" alt="Enhanced result" src="https://github.com/user-attachments/assets/ad6d1bc2-3026-442f-a309-a1dea2a1ea0b" />
+   </p>
 
-**Important Notes:**
+## Keyboard Shortcut
 
-* **Provider API Key Required:** The selected provider requires a valid API key. Create an OpenRouter key at [https://openrouter.ai/keys](https://openrouter.ai/keys) or a Groq key at [https://console.groq.com/keys](https://console.groq.com/keys).
-* **API Usage:** Model availability, free-tier limits, and pricing can change. Check the selected provider's model page before using it.
-* **Error Handling:** If the API key is not set or if there are issues communicating with the Groq API, the extension will display an alert message.
+| Action | Windows / Linux | macOS |
+| --- | --- | --- |
+| Enhance current prompt | `Ctrl+Shift+E` | `Cmd+Shift+E` |
+
+## Important Notes
+
+- **Provider API key required** — create an OpenRouter key at [openrouter.ai/keys](https://openrouter.ai/keys) or a Groq key at [console.groq.com/keys](https://console.groq.com/keys).
+- **API usage** — model availability, free-tier limits, and pricing can change; check the provider's model page before use.
+- **Error handling** — missing keys, invalid keys, rate limits, and unavailable models are reported via an inline toast with guidance.
+- **Selection-aware** — if text is selected inside the input, only the selection is enhanced.
 
 ## Contributing
 
-Contributions to improve the Prompt Enhancer are welcome! Please feel free to fork this repository, make your changes, and submit a pull request.
+Contributions are welcome! Feel free to fork this repository, make your changes, and submit a pull request.
 
+## License
 
-
+Released under the [MIT License](LICENSE).
 

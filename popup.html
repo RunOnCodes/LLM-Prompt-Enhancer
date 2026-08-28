@@ -7,35 +7,56 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="card">
-    <div class="card__header">
+  <div class="backdrop" aria-hidden="true"></div>
+
+  <main class="card">
+    <header class="card__header">
       <div class="brand">
-        <span class="brand__logo">✨</span>
-        <h2 class="brand__title">Prompt Enhancer</h2>
+        <span class="brand__logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="sparkGrad" x1="4" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8"/>
+                <stop offset="1" stop-color="#34d399"/>
+              </linearGradient>
+            </defs>
+            <path d="M12 2l2.1 5.9L20 10l-5.9 2.1L12 18l-2.1-5.9L4 10l5.9-2.1L12 2z" fill="url(#sparkGrad)"/>
+            <path d="M18.8 14.8l.9 2.5 2.5.9-2.5.9-.9 2.5-.9-2.5-2.5-.9 2.5-.9.9-2.5z" fill="url(#sparkGrad)" opacity=".75"/>
+          </svg>
+        </span>
+        <div>
+          <h2 class="brand__title">Prompt Enhancer</h2>
+          <p class="subtitle">Choose a provider and set your API key.</p>
+        </div>
       </div>
-      <p class="subtitle">Choose an AI provider and configure its API key.</p>
-    </div>
+    </header>
 
-    <form id="apiForm">
-      <label for="providerSelect" class="label">AI Provider</label>
-      <div class="field-full">
-        <select id="providerSelect" class="input">
-          <option value="openrouter">OpenRouter</option>
-          <option value="groq">Groq</option>
-        </select>
+    <form id="apiForm" autocomplete="off" novalidate>
+      <label class="label">AI Provider</label>
+      <div class="segmented" id="providerToggle" data-active="groq" role="radiogroup" aria-label="AI Provider">
+        <span class="segmented__thumb" aria-hidden="true"></span>
+        <button type="button" class="segment" data-provider="openrouter" role="radio" aria-checked="false">OpenRouter</button>
+        <button type="button" class="segment" data-provider="groq" role="radio" aria-checked="true">Groq</button>
       </div>
 
-      <label for="apiKey" class="label" id="apiKeyLabel">OpenRouter API Key</label>
+      <label for="apiKey" class="label" id="apiKeyLabel">Groq API Key</label>
       <div class="field">
-        <input type="password" id="apiKey" class="input" placeholder="sk-or-v1-..." autocomplete="off">
-        <button type="button" class="icon-btn" id="toggleVis" title="Show/Hide">👁️</button>
-        <button type="button" class="icon-btn" id="copyKey" title="Copy">📋</button>
+        <input type="password" id="apiKey" class="input" placeholder="gsk_..." autocomplete="off" spellcheck="false">
+        <button type="button" class="icon-btn" id="toggleVis" title="Show/Hide" aria-label="Show or hide API key">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button type="button" class="icon-btn" id="copyKey" title="Copy" aria-label="Copy API key">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
       </div>
 
-        <label for="modelSelect" class="label" id="modelLabel">OpenRouter Model</label>
-      <div class="field-full">
-		<select id="modelSelect" class="input">
-		</select>
+      <label class="label" id="modelLabel">Groq Model</label>
+      <div class="dropdown" id="modelDropdown">
+        <button type="button" class="input dropdown__toggle" id="modelToggle" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dropdown__value" id="modelValue">Qwen 3.8 27B</span>
+          <svg class="dropdown__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <ul class="dropdown__menu" id="modelMenu" role="listbox" aria-label="Model" hidden></ul>
       </div>
 
       <div class="actions">
@@ -44,12 +65,12 @@
       </div>
     </form>
 
-    <div class="footer">
-      <small class="hint">Keyboard Shortcut: Ctrl+Shift+E</small>
-    </div>
-  </div>
+    <footer class="footer">
+      <small class="hint">Shortcut: <kbd>Ctrl</kbd><span class="hint__plus">+</span><kbd>Shift</kbd><span class="hint__plus">+</span><kbd>E</kbd></small>
+    </footer>
+  </main>
 
-  <div id="toast" class="toast">Settings saved.</div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Settings saved.</div>
   <script src="popup.js"></script>
 </body>
 </html>

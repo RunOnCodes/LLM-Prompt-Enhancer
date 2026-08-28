@@ -7,72 +7,107 @@
     margin: 8px 0;
     flex-wrap: wrap;
     position: relative;
-    z-index: 99999; 
+    z-index: 99999;
 }
 
 .enhance-button {
-    background-color: var(--enhancer-bg, #2a2b32);
-    color: var(--enhancer-text, #ffffff);
-    border: 1px solid var(--enhancer-border, #4b5563);
-    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: linear-gradient(135deg, #6366f1, #10b981);
+    color: #ffffff;
+    border: none;
+    padding: 6px 15px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
     font-size: 0.85em;
-    border-radius: 16px;
+    border-radius: 999px;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    font-weight: 500;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+    font-weight: 600;
     font-family: system-ui, -apple-system, sans-serif;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    position: relative; 
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
+    position: relative;
     z-index: 99999;
-    height: 32px; 
+    height: 32px;
     line-height: normal;
+    white-space: nowrap;
 }
 
 .enhance-button:hover:not(:disabled) {
-    background-color: var(--enhancer-hover, #3f4148);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.45);
+    filter: saturate(1.1);
+}
+
+.enhance-button:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
 }
 
 .enhance-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    opacity: 0.8;
+    cursor: progress;
+}
+
+.enhance-button__icon { font-size: 0.95em; }
+
+.enhance-button__spinner {
+    display: none;
+    width: 13px;
+    height: 13px;
+    flex: none;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: enhancer-spin 0.7s linear infinite;
+}
+
+.enhance-button.is-loading .enhance-button__spinner { display: inline-block; }
+.enhance-button.is-loading .enhance-button__icon { display: none; }
+
+@keyframes enhancer-spin {
+    to { transform: rotate(360deg); }
 }
 
 .revert-button {
-    background-color: transparent;
-    border-color: #ef4444;
-    color: #ef4444;
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.45);
+    color: #f87171;
+    box-shadow: none;
 }
 
 .revert-button:hover:not(:disabled) {
-    background-color: rgba(239, 68, 68, 0.1);
+    background: rgba(248, 113, 113, 0.16);
+    box-shadow: 0 4px 14px rgba(248, 113, 113, 0.2);
 }
 
 .enhancer-inline-toast {
-    font-size: 0.8em;
+    font-size: 0.78em;
     font-family: system-ui, -apple-system, sans-serif;
+    font-weight: 500;
     opacity: 0;
     transition: opacity 0.3s ease;
     white-space: nowrap;
     z-index: 99999;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(13, 16, 24, 0.88);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e5e7eb;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
 }
 
-@media (prefers-color-scheme: light) {
-    :root {
-        --enhancer-bg: #f9fafb;
-        --enhancer-text: #111827;
-        --enhancer-border: #d1d5db;
-        --enhancer-hover: #e5e7eb;
-    }
-}
+.enhancer-inline-toast.is-ok { color: #6ee7b7; }
+.enhancer-inline-toast.is-error { color: #fca5a5; }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --enhancer-bg: #1f2937;
-        --enhancer-text: #f9fafb;
-        --enhancer-border: #4b5563;
-        --enhancer-hover: #374151;
+@media (prefers-reduced-motion: reduce) {
+    .enhance-button,
+    .enhancer-inline-toast,
+    .enhance-button__spinner {
+        transition: none !important;
+        animation: none !important;
     }
 }

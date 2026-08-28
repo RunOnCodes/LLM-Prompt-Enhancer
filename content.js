@@ -21,11 +21,19 @@ function applyTextDirection(el) {
 
 function showToast(el, msg, isError) {
     el.textContent = msg;
-    el.style.color = isError ? '#ef4444' : '#22c55e';
+    el.classList.toggle('is-error', !!isError);
+    el.classList.toggle('is-ok', !isError);
     el.style.opacity = '1';
     setTimeout(() => {
         el.style.opacity = '0';
     }, 4000);
+}
+
+function setButtonLoading(btn, loading) {
+    btn.classList.toggle('is-loading', loading);
+    btn.disabled = loading;
+    const label = btn.querySelector('.enhance-button__label');
+    if (label) label.textContent = loading ? 'Enhancing…' : 'Enhance Prompt';
 }
 
 function setReactInputValue(element, value) {
@@ -80,8 +88,11 @@ function addEnhanceButton() {
 
         const button = document.createElement('button');
         button.className = 'enhance-button';
-        button.textContent = '✨ Enhance Prompt';
         button.title = "Shortcut: Ctrl+Shift+E";
+        button.innerHTML =
+            '<span class="enhance-button__icon" aria-hidden="true">✨</span>' +
+            '<span class="enhance-button__label">Enhance Prompt</span>' +
+            '<span class="enhance-button__spinner" aria-hidden="true"></span>';
 
         const revertBtn = document.createElement('button');
         revertBtn.className = 'enhance-button revert-button';
@@ -166,22 +177,19 @@ function addEnhanceButton() {
                 return;
             }
 
-            originalText = currentText; 
-            button.textContent = '✨ Enhancing...';
-            button.disabled = true;
+            originalText = currentText;
+            setButtonLoading(button, true);
 
             try {
                 chrome.runtime.sendMessage({ action: 'enhance', text: textToEnhance }, (response) => {
                     if (chrome.runtime.lastError) {
                         console.error(chrome.runtime.lastError.message);
-                        button.textContent = '✨ Enhance Prompt';
-                        button.disabled = false;
+                        setButtonLoading(button, false);
                         showToast(toast, "Extension updated. Please refresh the page.", true);
                         return;
                     }
 
-                    button.textContent = '✨ Enhance Prompt';
-                    button.disabled = false;
+                    setButtonLoading(button, false);
 
                     if (!response) {
                          showToast(toast, "Error connecting to extension. Please refresh the page.", true);
@@ -206,8 +214,7 @@ function addEnhanceButton() {
                 });
             } catch (e) {
                 console.error("SendMessage failed:", e);
-                button.textContent = '✨ Enhance Prompt';
-                button.disabled = false;
+                setButtonLoading(button, false);
                 showToast(toast, "Extension context error. Please refresh the page.", true);
             }
         };

@@ -1,11 +1,10 @@
-const DEFAULT_PROVIDER = 'openrouter';
+const DEFAULT_PROVIDER = 'groq';
 const DEFAULT_MODELS = {
-    openrouter: 'stealth/ox-alpha',
-    groq: 'llama-3.3-70b-versatile'
+    openrouter: 'openrouter/free',
+    groq: 'qwen/qwen3.8-27b'
 };
 const SUPPORTED_MODELS = {
     openrouter: new Set([
-    'stealth/ox-alpha',
     'openrouter/free',
     'dots-studio/dots-3-note-preview:free',
     'liquid/lfm-2.5-2.6b:free',

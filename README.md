@@ -17,9 +17,7 @@ The **Prompt Enhancer** is a Chrome extension designed to improve the quality of
 * The popup presents a compact provider settings screen with separate model lists and API keys for OpenRouter and Groq.
 * The popup loads any previously saved key on open and provides a brief saved status message after storing changes.
   
-<img width="312" height="409" alt="Screenshot_1" src="https://github.com/user-attachments/assets/989bd03e-58a9-4b93-bb78-040ac3aa7a20" />
-
-
+  <img width="319" height="314" alt="newMenu" src="https://github.com/user-attachments/assets/dace5258-8d89-4fef-9e82-0ba5bbc46cbb" />
 
 
 ## Installation

@@ -1,12 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = (s) => document.querySelector(s);
     const defaults = {
-        openrouter: 'stealth/ox-alpha',
-        groq: 'llama-3.3-70b-versatile'
+        openrouter: 'openrouter/free',
+        groq: 'qwen/qwen3.8-27b'
     };
     const models = {
         openrouter: [
-            ['stealth/ox-alpha', 'Ox Alpha (Default)'],
             ['openrouter/free', 'OpenRouter Free Models Router'],
             ['dots-studio/dots-3-note-preview:free', 'Dots3 Note Preview (Free)'],
             ['liquid/lfm-2.5-2.6b:free', 'Liquid LFM 2.5 2.6B (Free)'],
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ['openai/gpt-oss-20b', 'GPT OSS 20B (Fast)'],
             ['qwen/qwen3-32b', 'Qwen 3 32B'],
             ['qwen/qwen3.6-27b', 'Qwen 3.6 27B'],
-            ['qwen/qwen3.8-27b', 'Qwen 3.8 27B']
+            ['qwen/qwen3.8-27b', 'Qwen 3.8 27B (Default)']
         ]
     };
 

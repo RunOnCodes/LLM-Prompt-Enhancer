@@ -33,7 +33,8 @@ A **Chrome extension** that turns rough ideas into well-structured, effective pr
 **Popup — provider, model, and API key settings:**
 
 <p align="center">
-  <img width="333" alt="Popup settings screen" src="https://github.com/user-attachments/assets/5a915145-79cc-41d5-b76a-33a05e74ea66" />
+  <img width="333" height="581" alt="Screenshot_1" src="https://github.com/user-attachments/assets/83403df7-3310-4635-983c-ff147423ea20" />
+
 </p>
 
 **Enhance Prompt button next to the input:**
@@ -125,7 +126,8 @@ ChatGPT (`chatgpt.com`, `chat.openai.com`), Claude, Gemini, AI Studio, NotebookL
 - Click **Save Settings** — the key, model, style, and instructions are stored (keys/models per provider).
 
 <p align="center">
-  <img width="333" alt="Configuring the popup" src="https://github.com/user-attachments/assets/5a915145-79cc-41d5-b76a-33a05e74ea66" />
+  <img width="333" height="581" alt="Screenshot_1" src="https://github.com/user-attachments/assets/1299920f-de95-4d7d-8f28-5a8eb4c5bbad" />
+
 </p>
 
 ### 2. Enhance a prompt

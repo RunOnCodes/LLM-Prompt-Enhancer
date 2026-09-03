@@ -26,8 +26,12 @@
         </span>
         <div>
           <h2 class="brand__title">Prompt Enhancer</h2>
-          <p class="subtitle">Choose a provider and set your API key.</p>
+          <p class="subtitle">Turn rough ideas into strong prompts.</p>
         </div>
+        <label class="switch switch--header" title="Enable / disable extension">
+          <input type="checkbox" id="enabledToggle" checked>
+          <span class="switch__track" aria-hidden="true"></span>
+        </label>
       </div>
     </header>
 
@@ -58,6 +62,19 @@
         </button>
         <ul class="dropdown__menu" id="modelMenu" role="listbox" aria-label="Model" hidden></ul>
       </div>
+
+      <label for="modeSelect" class="label">Enhance style</label>
+      <select id="modeSelect" class="input select">
+        <option value="standard">Standard — balanced</option>
+        <option value="concise" selected>Concise — 10-15 sentences (default)</option>
+        <option value="detailed">Detailed — criteria &amp; edge cases</option>
+        <option value="coding">Coding — specs, examples, tests</option>
+        <option value="writing">Writing — audience, tone, structure</option>
+        <option value="reasoning">Reasoning — step-by-step</option>
+      </select>
+
+      <label for="customInstructions" class="label">Custom instructions <span class="label__opt">(optional)</span></label>
+      <textarea id="customInstructions" class="input textarea" rows="2" maxlength="1000" placeholder="e.g. Always ask for a table. Prefer British English." spellcheck="false"></textarea>
 
       <div class="actions">
         <button type="submit" class="btn primary" id="save">Save Settings</button>

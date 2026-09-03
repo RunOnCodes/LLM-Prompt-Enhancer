@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
+    const MODES = ['standard', 'concise', 'detailed', 'coding', 'writing', 'reasoning'];
+    const DEFAULT_MODE = 'concise';
+
     const input = $('#apiKey');
     const modelToggle = $('#modelToggle');
     const modelValue = $('#modelValue');
@@ -47,16 +50,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiKeyLabel = $('#apiKeyLabel');
     const modelLabel = $('#modelLabel');
     const toast = $('#toast');
+    const modeSelect = $('#modeSelect');
+    const customInstructions = $('#customInstructions');
+    const enabledToggle = $('#enabledToggle');
 
     let provider = 'groq';
     let selectedModel = defaults.groq;
     let menuOpen = false;
     let t;
 
+    function resolveProvider(saved) {
+        return saved === 'openrouter' ? 'openrouter' : 'groq';
+    }
+
     function isValidKey(v, p) {
-        return p === 'groq'
-            ? /^gsk_[A-Za-z0-9-_]{16,}$/.test((v || '').trim())
-            : /^sk-or-v1-[A-Za-z0-9]{16,}$/.test((v || '').trim());
+        const s = (v || '').trim();
+        if (!s) return true; // allow empty (clear)
+        if (p === 'groq') return /^gsk_[A-Za-z0-9]{8,}$/.test(s);
+        return /^sk-or-v1-[A-Za-z0-9-]{8,}$/.test(s);
     }
 
     function renderMenu() {
@@ -116,8 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
         modelToggle.setAttribute('aria-expanded', String(open));
     }
 
-    chrome.storage.sync.get(['provider'], (res) =>
-        loadProviderSettings(res.provider === 'groq' ? 'groq' : 'openrouter')
+    chrome.storage.sync.get(
+        ['provider', 'enhanceMode', 'customInstructions', 'enabled'],
+        (res) => {
+            loadProviderSettings(resolveProvider(res.provider));
+            const mode = MODES.includes(res.enhanceMode) ? res.enhanceMode : DEFAULT_MODE;
+            modeSelect.value = mode;
+            customInstructions.value = res.customInstructions || '';
+            enabledToggle.checked = res.enabled !== false;
+        }
     );
 
     segments.forEach((s) => s.addEventListener('click', () => {
@@ -150,13 +168,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('apiForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const key = input.value.trim();
-        if (key && !isValidKey(key, provider)) {
-            return toastMsg(`Enter a valid ${providers[provider].label} key.`);
+        if (!isValidKey(key, provider)) {
+            return toastMsg(`That doesn't look like a valid ${providers[provider].label} key.`);
         }
+        const mode = MODES.includes(modeSelect.value) ? modeSelect.value : DEFAULT_MODE;
         chrome.storage.sync.set({
             provider,
             [`${provider}ApiKey`]: key,
-            [`${provider}Model`]: selectedModel
+            [`${provider}Model`]: selectedModel,
+            enhanceMode: mode,
+            customInstructions: customInstructions.value.trim().slice(0, 1000),
+            enabled: enabledToggle.checked
         }, () => toastMsg('Settings saved successfully.'));
     });
 
@@ -164,6 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('clear').addEventListener('click', () => {
         input.value = '';
         chrome.storage.sync.remove([`${provider}ApiKey`], () => toastMsg('API Key cleared.'));
+    });
+
+    // Instant-apply toggle (no save click needed)
+    enabledToggle.addEventListener('change', () => {
+        chrome.storage.sync.set({ enabled: enabledToggle.checked }, () =>
+            toastMsg(enabledToggle.checked ? 'Extension enabled.' : 'Extension paused.')
+        );
     });
 
     // Show/Hide

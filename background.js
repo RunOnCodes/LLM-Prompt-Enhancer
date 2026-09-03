@@ -1,32 +1,79 @@
 const DEFAULT_PROVIDER = 'groq';
-const DEFAULT_MODELS = {
-    openrouter: 'openrouter/free',
-    groq: 'qwen/qwen3.8-27b'
-};
-const SUPPORTED_MODELS = {
-    openrouter: new Set([
-        'openrouter/free',
-        'dots-studio/dots-3-note-preview:free',
-        'liquid/lfm-2.5-2.6b:free',
-        'nvidia/nemotron-3.5-lightning:free',
-        'thinkingmachines/inkling:free',
-        'poolside/laguna-s-2.1:free',
-        'cohere/north-mini-code:free',
-        'z-ai/glm-5.2:free',
-        'minimax/minimax-m3:free'
-    ]),
-    groq: new Set([
-        'llama-3.1-8b-instant',
-        'llama-3.3-70b-versatile',
-        'meta-llama/llama-4-maverick-17b-128e-instruct',
-        'meta-llama/llama-4-scout-17b-16e-instruct',
-        'moonshotai/kimi-k2-instruct',
-        'openai/gpt-oss-120b',
-        'openai/gpt-oss-20b',
-        'qwen/qwen3-32b',
-        'qwen/qwen3.6-27b',
-        'qwen/qwen3.8-27b'
-    ])
+// All providers below speak the OpenAI chat-completions dialect and offer a
+// free tier. To add another OpenAI-compatible provider, just append an entry.
+const PROVIDERS = {
+    groq: {
+        label: 'Groq',
+        endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+        keyUrl: 'https://console.groq.com/keys',
+        defaultModel: 'qwen/qwen3.8-27b',
+        models: new Set([
+            'llama-3.1-8b-instant',
+            'llama-3.3-70b-versatile',
+            'meta-llama/llama-4-maverick-17b-128e-instruct',
+            'meta-llama/llama-4-scout-17b-16e-instruct',
+            'moonshotai/kimi-k2-instruct',
+            'openai/gpt-oss-120b',
+            'openai/gpt-oss-20b',
+            'qwen/qwen3-32b',
+            'qwen/qwen3.6-27b',
+            'qwen/qwen3.8-27b'
+        ])
+    },
+    openrouter: {
+        label: 'OpenRouter',
+        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+        keyUrl: 'https://openrouter.ai/keys',
+        extraHeaders: {
+            'HTTP-Referer': 'https://github.com/prompt-enhancer',
+            'X-Title': 'Prompt Enhancer'
+        },
+        defaultModel: 'openrouter/free',
+        models: new Set([
+            'openrouter/free',
+            'dots-studio/dots-3-note-preview:free',
+            'liquid/lfm-2.5-2.6b:free',
+            'nvidia/nemotron-3.5-lightning:free',
+            'thinkingmachines/inkling:free',
+            'poolside/laguna-s-2.1:free',
+            'cohere/north-mini-code:free',
+            'z-ai/glm-5.2:free',
+            'minimax/minimax-m3:free'
+        ])
+    },
+    gemini: {
+        label: 'Gemini',
+        endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+        keyUrl: 'https://aistudio.google.com/app/apikey',
+        defaultModel: 'gemini-3.8-flash',
+        models: new Set([
+            'gemini-3.8-flash',
+            'gemini-2.5-flash',
+            'gemini-2.5-pro'
+        ])
+    },
+    cerebras: {
+        label: 'Cerebras',
+        endpoint: 'https://api.cerebras.ai/v1/chat/completions',
+        keyUrl: 'https://cloud.cerebras.ai',
+        defaultModel: 'gpt-oss-120b',
+        models: new Set([
+            'gpt-oss-120b',
+            'llama3.1-8b'
+        ])
+    },
+    mistral: {
+        label: 'Mistral',
+        endpoint: 'https://api.mistral.ai/v1/chat/completions',
+        keyUrl: 'https://console.mistral.ai/api-keys',
+        defaultModel: 'mistral-small-latest',
+        models: new Set([
+            'mistral-small-latest',
+            'mistral-large-latest',
+            'codestral-latest',
+            'open-mistral-nemo'
+        ])
+    }
 };
 
 const DEFAULT_MODE = 'concise';
@@ -65,7 +112,7 @@ const MODES = {
 };
 
 function resolveProvider(saved) {
-    return saved === 'openrouter' ? 'openrouter' : 'groq';
+    return PROVIDERS[saved] ? saved : DEFAULT_PROVIDER;
 }
 
 function cleanEnhancedText(text) {
@@ -181,24 +228,22 @@ function friendlyError(providerLabel, error) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'enhance') {
         chrome.storage.sync.get(
-            ['provider', 'openrouterApiKey', 'openrouterModel', 'groqApiKey', 'groqModel', 'enhanceMode', 'customInstructions'],
+            ['provider', 'groqApiKey', 'groqModel', 'openrouterApiKey', 'openrouterModel', 'geminiApiKey', 'geminiModel', 'cerebrasApiKey', 'cerebrasModel', 'mistralApiKey', 'mistralModel', 'enhanceMode', 'customInstructions'],
             async (res) => {
                 const provider = resolveProvider(res.provider);
-                const providerLabel = provider === 'groq' ? 'Groq' : 'OpenRouter';
-                const apiKey = provider === 'groq' ? res.groqApiKey : res.openrouterApiKey;
+                const cfg = PROVIDERS[provider];
+                const apiKey = res[`${provider}ApiKey`];
                 if (!apiKey || !String(apiKey).trim()) {
-                    sendResponse({ error: `${providerLabel} API Key is not set. Please set it in the extension popup.` });
+                    sendResponse({ error: `${cfg.label} API Key is not set. Get a free key at ${cfg.keyUrl} and set it in the extension popup.` });
                     return;
                 }
 
-                const savedModel = provider === 'groq' ? res.groqModel : res.openrouterModel;
-                const modelToUse = SUPPORTED_MODELS[provider].has(savedModel)
+                const savedModel = res[`${provider}Model`];
+                const modelToUse = cfg.models.has(savedModel)
                     ? savedModel
-                    : DEFAULT_MODELS[provider];
+                    : cfg.defaultModel;
                 const mode = MODES[res.enhanceMode] ? res.enhanceMode : DEFAULT_MODE;
-                const endpoint = provider === 'groq'
-                    ? 'https://api.groq.com/openai/v1/chat/completions'
-                    : 'https://openrouter.ai/api/v1/chat/completions';
+                const endpoint = cfg.endpoint;
 
                 const text = String(request.text || '').slice(0, 12000);
                 if (!text.trim()) {
@@ -209,12 +254,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 try {
                     const headers = {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${String(apiKey).trim()}`
+                        'Authorization': `Bearer ${String(apiKey).trim()}`,
+                        ...(cfg.extraHeaders || {})
                     };
-                    if (provider === 'openrouter') {
-                        headers['HTTP-Referer'] = 'https://github.com/prompt-enhancer';
-                        headers['X-Title'] = 'Prompt Enhancer';
-                    }
 
                     const response = await fetchWithTimeout(endpoint, {
                         method: 'POST',
@@ -258,7 +300,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     sendResponse({ text: enhancedText, model: modelToUse });
                 } catch (error) {
                     console.error(`${provider} API Error:`, error);
-                    sendResponse({ error: friendlyError(providerLabel, error) });
+                    sendResponse({ error: friendlyError(cfg.label, error) });
                 }
             }
         );

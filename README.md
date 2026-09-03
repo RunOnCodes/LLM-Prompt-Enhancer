@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e)](LICENSE)
 [![Chrome](https://img.shields.io/badge/Chrome-Manifest%20V3-6366f1)](https://developer.chrome.com/docs/extensions/develop/concepts/manifest-v3)
-[![Providers](https://img.shields.io/badge/Providers-OpenRouter%20%7C%20Groq-34d399)](#supported-models)
+[![Providers](https://img.shields.io/badge/Providers-Groq%20%7C%20OpenRouter%20%7C%20Gemini%20%7C%20Cerebras%20%7C%20Mistral-34d399)](#supported-models)
 
 A **Chrome extension** that turns rough ideas into well-structured, effective prompts for LLMs — with a bonus automatic **RTL/LTR text-direction fix** for Persian and Arabic text on AI chat platforms.
 
@@ -15,7 +15,7 @@ A **Chrome extension** that turns rough ideas into well-structured, effective pr
 - ✨ **Prompt Enhancement** — restructures rough input into clear, actionable prompts while preserving intent, language, and tone
 - 🎛️ **Enhance styles** — 6 modes with tuned prompts and temperatures: Concise *(default)*, Standard, Detailed, Coding, Writing, Reasoning
 - 📝 **Custom instructions** — optional preferences (up to 1000 chars) applied on top, e.g. "Always ask for a table"
-- 🔀 **Provider Choice** — switch between **OpenRouter** and **Groq** with a segmented toggle
+- 🔀 **Provider Choice** — 5 free-tier providers (Groq, OpenRouter, Gemini, Cerebras, Mistral) in one dropdown, each with its own key, model, and free-key signup link
 - 🧠 **Model Picker** — custom dropdown with badges (Default / Free / Fast / Versatile / Reasoning) for each provider
 - 💾 **Secure Storage** — API keys and preferences saved per provider via `chrome.storage.sync`
 - 🌐 **RTL/LTR Auto-Fix** — Persian/Arabic text is always detected and rendered right-to-left with the bundled Vazirmatn font (CSP-safe, no network fetch)
@@ -33,7 +33,7 @@ A **Chrome extension** that turns rough ideas into well-structured, effective pr
 **Popup — provider, model, and API key settings:**
 
 <p align="center">
-   <img width="337" height="569" alt="Screenshot_1" src="https://github.com/user-attachments/assets/9e04b934-0ce6-4022-a9b3-f7a5d373d6ab" />
+  <img width="333" alt="Popup settings screen" src="https://github.com/user-attachments/assets/5a915145-79cc-41d5-b76a-33a05e74ea66" />
 </p>
 
 **Enhance Prompt button next to the input:**
@@ -73,6 +73,30 @@ A **Chrome extension** that turns rough ideas into well-structured, effective pr
 | GLM 5.2 | `z-ai/glm-5.2:free` |
 | MiniMax M3 | `minimax/minimax-m3:free` |
 
+### Gemini (free tier — key at [aistudio.google.com](https://aistudio.google.com/app/apikey))
+
+| Model | Model ID |
+| --- | --- |
+| **Gemini 3.8 Flash** *(default)* | `gemini-3.8-flash` |
+| Gemini 2.5 Flash | `gemini-2.5-flash` |
+| Gemini 2.5 Pro | `gemini-2.5-pro` |
+
+### Cerebras (1M tokens/day free — key at [cloud.cerebras.ai](https://cloud.cerebras.ai))
+
+| Model | Model ID |
+| --- | --- |
+| **GPT OSS 120B** *(default)* | `gpt-oss-120b` |
+| Llama 3.1 8B | `llama3.1-8b` |
+
+### Mistral (free plan — key at [console.mistral.ai](https://console.mistral.ai/api-keys))
+
+| Model | Model ID |
+| --- | --- |
+| **Mistral Small** *(default)* | `mistral-small-latest` |
+| Mistral Large | `mistral-large-latest` |
+| Codestral (Code) | `codestral-latest` |
+| Mistral Nemo | `open-mistral-nemo` |
+
 > 💡 Saved models that are later removed by a provider automatically fall back to the default — no stale-model errors.
 
 ## Supported Sites
@@ -93,7 +117,7 @@ ChatGPT (`chatgpt.com`, `chat.openai.com`), Claude, Gemini, AI Studio, NotebookL
 ### 1. Configure the provider
 
 - Click the **Prompt Enhancer** icon in the Chrome toolbar to open the popup.
-- Pick a provider (**OpenRouter** or **Groq**) using the segmented toggle.
+- Pick a provider from the dropdown (**Groq**, **OpenRouter**, **Gemini**, **Cerebras**, or **Mistral** — all have free tiers; click "Get a free key →" if you need one).
 - Enter the matching API key and choose a model from the dropdown.
 - Pick an **Enhance style** (Concise by default; also Standard / Detailed / Coding / Writing / Reasoning).
 - Optionally add **Custom instructions**, e.g. "Always ask for a table. Prefer British English."
@@ -101,7 +125,7 @@ ChatGPT (`chatgpt.com`, `chat.openai.com`), Claude, Gemini, AI Studio, NotebookL
 - Click **Save Settings** — the key, model, style, and instructions are stored (keys/models per provider).
 
 <p align="center">
-  <img width="337" height="569" alt="Screenshot_1" src="https://github.com/user-attachments/assets/e7ff8aa4-c6cb-4039-ba48-4d4691947d72" />
+  <img width="333" alt="Configuring the popup" src="https://github.com/user-attachments/assets/5a915145-79cc-41d5-b76a-33a05e74ea66" />
 </p>
 
 ### 2. Enhance a prompt
@@ -144,7 +168,7 @@ ChatGPT (`chatgpt.com`, `chat.openai.com`), Claude, Gemini, AI Studio, NotebookL
 
 ## Important Notes
 
-- **Provider API key required** — create an OpenRouter key at [openrouter.ai/keys](https://openrouter.ai/keys) or a Groq key at [console.groq.com/keys](https://console.groq.com/keys).
+- **Provider API key required** — all providers have free tiers: Groq ([console.groq.com/keys](https://console.groq.com/keys)), OpenRouter ([openrouter.ai/keys](https://openrouter.ai/keys)), Gemini ([aistudio.google.com](https://aistudio.google.com/app/apikey)), Cerebras ([cloud.cerebras.ai](https://cloud.cerebras.ai)), Mistral ([console.mistral.ai](https://console.mistral.ai/api-keys)). No credit card needed for any of them.
 - **API usage** — model availability, free-tier limits, and pricing can change; check the provider's model page before use.
 - **Error handling** — missing/invalid keys, exhausted credits, rate limits, unknown models, timeouts, and network errors are reported via an inline toast with guidance.
 - **Selection-aware** — if text is selected inside the input, only the selection is enhanced; otherwise the whole input is used. Input is capped at ~12,000 chars per request.

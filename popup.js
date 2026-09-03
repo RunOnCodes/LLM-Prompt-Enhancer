@@ -3,12 +3,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const defaults = {
         openrouter: 'openrouter/free',
-        groq: 'qwen/qwen3.8-27b'
+        groq: 'qwen/qwen3.8-27b',
+        gemini: 'gemini-3.8-flash',
+        cerebras: 'gpt-oss-120b',
+        mistral: 'mistral-small-latest'
     };
 
     const providers = {
-        openrouter: { label: 'OpenRouter', placeholder: 'sk-or-v1-...' },
-        groq: { label: 'Groq', placeholder: 'gsk_...' }
+        groq: { label: 'Groq', placeholder: 'gsk_...', keyUrl: 'https://console.groq.com/keys' },
+        openrouter: { label: 'OpenRouter', placeholder: 'sk-or-v1-...', keyUrl: 'https://openrouter.ai/keys' },
+        gemini: { label: 'Gemini', placeholder: 'AIza...', keyUrl: 'https://aistudio.google.com/app/apikey' },
+        cerebras: { label: 'Cerebras', placeholder: 'csk-...', keyUrl: 'https://cloud.cerebras.ai' },
+        mistral: { label: 'Mistral', placeholder: 'paste key...', keyUrl: 'https://console.mistral.ai/api-keys' }
     };
 
     const models = {
@@ -34,6 +40,21 @@ document.addEventListener('DOMContentLoaded', () => {
             ['qwen/qwen3-32b', 'Qwen 3 32B', ''],
             ['qwen/qwen3.6-27b', 'Qwen 3.6 27B', ''],
             ['qwen/qwen3.8-27b', 'Qwen 3.8 27B', 'Default']
+        ],
+        gemini: [
+            ['gemini-3.8-flash', 'Gemini 3.8 Flash', 'Default'],
+            ['gemini-2.5-flash', 'Gemini 2.5 Flash', 'Free'],
+            ['gemini-2.5-pro', 'Gemini 2.5 Pro', 'Free']
+        ],
+        cerebras: [
+            ['gpt-oss-120b', 'GPT OSS 120B', 'Default'],
+            ['llama3.1-8b', 'Llama 3.1 8B', 'Free']
+        ],
+        mistral: [
+            ['mistral-small-latest', 'Mistral Small', 'Default'],
+            ['mistral-large-latest', 'Mistral Large', ''],
+            ['codestral-latest', 'Codestral', 'Code'],
+            ['open-mistral-nemo', 'Mistral Nemo', 'Free']
         ]
     };
 
@@ -45,8 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const modelValue = $('#modelValue');
     const modelMenu = $('#modelMenu');
     const modelDropdown = $('#modelDropdown');
-    const providerToggle = $('#providerToggle');
-    const segments = [...providerToggle.querySelectorAll('.segment')];
+    const providerSelect = $('#providerSelect');
+    const keyLink = $('#keyLink');
     const apiKeyLabel = $('#apiKeyLabel');
     const modelLabel = $('#modelLabel');
     const toast = $('#toast');
@@ -60,14 +81,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let t;
 
     function resolveProvider(saved) {
-        return saved === 'openrouter' ? 'openrouter' : 'groq';
+        return providers[saved] ? saved : 'groq';
     }
 
     function isValidKey(v, p) {
         const s = (v || '').trim();
         if (!s) return true; // allow empty (clear)
         if (p === 'groq') return /^gsk_[A-Za-z0-9]{8,}$/.test(s);
-        return /^sk-or-v1-[A-Za-z0-9-]{8,}$/.test(s);
+        if (p === 'openrouter') return /^sk-or-v1-[A-Za-z0-9-]{8,}$/.test(s);
+        if (p === 'gemini') return /^AIza[A-Za-z0-9_-]{10,}$/.test(s);
+        if (p === 'cerebras') return /^csk-\S{8,}$/.test(s);
+        if (p === 'mistral') return /^[A-Za-z0-9]{16,}$/.test(s);
+        return s.length >= 8;
     }
 
     function renderMenu() {
@@ -96,24 +121,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderProvider(p, savedModel) {
-        provider = p;
-        const meta = providers[p];
+        provider = providers[p] ? p : 'groq';
+        const meta = providers[provider];
         apiKeyLabel.textContent = `${meta.label} API Key`;
         modelLabel.textContent = `${meta.label} Model`;
         input.placeholder = meta.placeholder;
-        providerToggle.dataset.active = p;
-        segments.forEach((s) => {
-            const active = s.dataset.provider === p;
-            s.classList.toggle('is-active', active);
-            s.setAttribute('aria-checked', String(active));
-        });
-        selectedModel = models[p].some(([v]) => v === savedModel) ? savedModel : defaults[p];
+        keyLink.href = meta.keyUrl;
+        providerSelect.value = provider;
+        selectedModel = models[provider].some(([v]) => v === savedModel) ? savedModel : defaults[provider];
         renderMenu();
     }
 
     function loadProviderSettings(p) {
-        const keyName = p === 'groq' ? 'groqApiKey' : 'openrouterApiKey';
-        const modelName = p === 'groq' ? 'groqModel' : 'openrouterModel';
+        const keyName = `${p}ApiKey`;
+        const modelName = `${p}Model`;
         chrome.storage.sync.get([keyName, modelName], (res) => {
             input.value = res[keyName] || '';
             renderProvider(p, res[modelName]);
@@ -138,10 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
-    segments.forEach((s) => s.addEventListener('click', () => {
+    providerSelect.addEventListener('change', () => {
         openMenu(false);
-        loadProviderSettings(s.dataset.provider);
-    }));
+        loadProviderSettings(providerSelect.value);
+    });
 
     modelToggle.addEventListener('click', (e) => {
         e.stopPropagation();

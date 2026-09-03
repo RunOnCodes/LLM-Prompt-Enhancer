@@ -103,54 +103,19 @@ html, body {
   color: var(--muted);
 }
 
-/* ----- Segmented provider toggle ----- */
-.segmented {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 4px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.segmented__thumb {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  border-radius: var(--radius-sm);
-  background: var(--surface-3);
-  border: 1px solid var(--border-strong);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.segmented[data-active="groq"] .segmented__thumb { transform: translateX(100%); }
-
-.segment {
-  position: relative;
-  z-index: 1;
-  height: 34px;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.18s ease;
-}
-
-.segment:hover { color: var(--text); }
-.segment.is-active {
-  color: var(--text);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(52, 211, 153, 0.14));
-}
-
 /* ----- Fields ----- */
+.keyhint {
+  margin: -2px 0 6px;
+  text-align: right;
+}
+
+.keyhint a {
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.keyhint a:hover { text-decoration: underline; }
 .field {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -309,7 +274,7 @@ html, body {
 .btn.ghost:hover { background: var(--surface-2); }
 .btn.ghost:active { transform: scale(0.98); }
 
-:where(.btn, .segment, .icon-btn, .dropdown__toggle):focus-visible {
+:where(.btn, .icon-btn, .dropdown__toggle):focus-visible {
   outline: none;
   box-shadow: var(--ring);
 }

@@ -36,14 +36,17 @@
     </header>
 
     <form id="apiForm" autocomplete="off" novalidate>
-      <label class="label">AI Provider</label>
-      <div class="segmented" id="providerToggle" data-active="groq" role="radiogroup" aria-label="AI Provider">
-        <span class="segmented__thumb" aria-hidden="true"></span>
-        <button type="button" class="segment" data-provider="openrouter" role="radio" aria-checked="false">OpenRouter</button>
-        <button type="button" class="segment" data-provider="groq" role="radio" aria-checked="true">Groq</button>
-      </div>
+      <label class="label" for="providerSelect">AI Provider</label>
+      <select id="providerSelect" class="input select">
+        <option value="groq">Groq — fast, free tier</option>
+        <option value="openrouter">OpenRouter — free models</option>
+        <option value="gemini">Gemini — free tier</option>
+        <option value="cerebras">Cerebras — 1M tokens/day free</option>
+        <option value="mistral">Mistral — free plan</option>
+      </select>
 
       <label for="apiKey" class="label" id="apiKeyLabel">Groq API Key</label>
+      <div class="keyhint"><a id="keyLink" href="https://console.groq.com/keys" target="_blank" rel="noopener">Get a free key →</a></div>
       <div class="field">
         <input type="password" id="apiKey" class="input" placeholder="gsk_..." autocomplete="off" spellcheck="false">
         <button type="button" class="icon-btn" id="toggleVis" title="Show/Hide" aria-label="Show or hide API key">

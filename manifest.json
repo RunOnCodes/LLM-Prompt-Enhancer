@@ -4,7 +4,7 @@
   "version": "4.0",
   "description": "Enhances prompts using OpenRouter AI and fixes RTL/LTR text direction on AI platforms",
   "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": ["https://openrouter.ai/*", "https://api.groq.com/*"],
+  "host_permissions": ["https://openrouter.ai/*", "https://api.groq.com/*", "https://generativelanguage.googleapis.com/*", "https://api.cerebras.ai/*", "https://api.mistral.ai/*"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
